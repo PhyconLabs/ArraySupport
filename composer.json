@@ -1,0 +1,9 @@
+{
+    "name": "sds/array-support",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "SDS\\ArraySupport\\": "src"
+        }
+    }
+}
