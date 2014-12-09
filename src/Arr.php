@@ -37,11 +37,53 @@ class Arr implements ArrayAccess
     public function offsetSet($offset, $value)
     {
         $this->array[$offset] = $value;
+        
+        return $this;
+    }
+    
+    public function offsetDeepSet($offset, $value)
+    {
+        $offsets = explode(".", $offset);
+        $lastOffset = array_pop($offsets);
+        $currentLevel =& $this->array;
+        
+        foreach ($offsets as $offset) {
+            if (!isset($currentLevel[$offset]) || !is_array($currentLevel[$offset])) {
+                $currentLevel[$offset] = [];
+            }
+            
+            $currentLevel =& $currentLevel[$offset];
+        }
+        
+        $currentLevel[$lastOffset] = $value;
+        
+        return $this;
     }
     
     public function offsetUnset($offset)
     {
         unset($this->array[$offset]);
+        
+        return $this;
+    }
+    
+    public function offsetDeepUnset($offset)
+    {
+        $offsets = explode(".", $offset);
+        $lastOffset = array_pop($offsets);
+        $currentLevel =& $this->array;
+        
+        foreach ($offsets as $offset) {
+            if (!isset($currentLevel[$offset]) || !is_array($currentLevel[$offset])) {
+                return $this;
+            }
+            
+            $currentLevel =& $currentLevel[$offset];
+        }
+        
+        unset($currentLevel[$lastOffset]);
+        
+        return $this;
     }
     
     public function offsetExists($offset)
@@ -79,5 +121,10 @@ class Arr implements ArrayAccess
         }
         
         return $this;
+    }
+    
+    public function toArray()
+    {
+        return $this->array;
     }
 }
